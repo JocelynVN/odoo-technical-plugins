@@ -33,6 +33,22 @@ npx odoo-technical-plugins --list                 # list plugins
 
 This is idempotent and append-safe (won't duplicate an existing `AGENTS.md`).
 
+### Manage it (install · update · uninstall · status)
+
+The CLI tracks what it installed in a manifest (`.odoo-technical-plugins.json` per project, or `~/.odoo-technical-plugins.json` with `--global`), so updates and removals are clean:
+
+```bash
+npx odoo-technical-plugins status                 # what's installed (project + global)
+npx odoo-technical-plugins update                 # refresh installed files to the latest
+npx odoo-technical-plugins update --global
+npx odoo-technical-plugins uninstall              # remove everything tracked here
+npx odoo-technical-plugins uninstall --agent cursor   # remove just one agent
+npx odoo-technical-plugins uninstall --global --yes
+```
+
+Uninstall removes our Cursor rule / Claude skill outright and strips only our
+marker-wrapped block from a shared `AGENTS.md` (your other content stays).
+
 > Prefer no Node? There's also a bash script for Codex & Cursor:
 > ```bash
 > curl -fsSL https://raw.githubusercontent.com/JocelynVN/odoo-technical-plugins/main/plugins/odoo-technical-rules/install.sh | bash

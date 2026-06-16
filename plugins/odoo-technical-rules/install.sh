@@ -31,17 +31,19 @@ get() {
 }
 
 install_codex() {
-  local dest
+  local dest marker="odoo-technical-rules"
   if [ "$TARGET" = "global" ]; then dest="$HOME/.codex/AGENTS.md"; else dest="$TARGET/AGENTS.md"; fi
-  local content; content="$(get dist/codex/AGENTS.md)"
+  local body block
+  body="$(get dist/codex/AGENTS.md)"
+  block="$(printf '<!-- BEGIN %s -->\n%s\n<!-- END %s -->' "$marker" "$body" "$marker")"
   mkdir -p "$(dirname "$dest")"
-  if [ -f "$dest" ] && grep -q "Odoo Technical Rules (for Codex)" "$dest"; then
-    c_blue "Codex: already present in $dest — skipped."
+  if [ -f "$dest" ] && grep -q "<!-- BEGIN $marker -->" "$dest"; then
+    c_blue "Codex: already present in $dest — skipped (use 'npx odoo-technical-plugins update' to refresh)."
   elif [ -f "$dest" ]; then
-    { printf '\n\n'; printf '%s\n' "$content"; } >> "$dest"
+    { printf '\n'; printf '%s\n' "$block"; } >> "$dest"
     c_green "Codex: appended rules to existing $dest"
   else
-    printf '%s\n' "$content" > "$dest"
+    printf '%s\n' "$block" > "$dest"
     c_green "Codex: created $dest"
   fi
 }

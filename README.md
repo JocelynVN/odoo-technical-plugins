@@ -31,6 +31,14 @@ npx odoo-technical-plugins --agent codex --global
 
 > Pinned to the GitHub source instead of npm? `npx github:JocelynVN/odoo-technical-plugins` works the same (use `--` before flags).
 
+It's a full lifecycle manager — installs are tracked in a manifest so you can refresh or remove them cleanly:
+
+```bash
+npx odoo-technical-plugins status       # what's installed (project + global)
+npx odoo-technical-plugins update       # refresh to the latest rules
+npx odoo-technical-plugins uninstall    # remove cleanly
+```
+
 ### Claude Code marketplace (alternative)
 
 ```bash
