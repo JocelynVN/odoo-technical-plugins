@@ -1,0 +1,17 @@
+{
+  "name": "odoo-technical-rules",
+  "owner": {
+    "name": "JocelynVN",
+    "url": "https://github.com/JocelynVN"
+  },
+  "metadata": {
+    "description": "General, vendor-neutral technical rules for Odoo module development."
+  },
+  "plugins": [
+    {
+      "name": "odoo-technical-rules",
+      "source": "./plugins/odoo-technical-rules",
+      "description": "Apply general Odoo technical rules (naming, manifest, views, Python/ORM, security, commits, stable policy) when writing or reviewing Odoo module code."
+    }
+  ]
+}
