@@ -1,8 +1,9 @@
 # Installation guide — odoo-technical-rules
 
-This plugin is an **Agent Skill** (`SKILL.md`). Claude Code, Codex, and Cursor all
-support the Agent Skills standard, so one installer covers all three — it copies
-the skill folder into the agent's skills directory.
+The installer writes the rules into each agent's **always-on instructions file**
+so they load at the start of every session — `AGENTS.md` for Codex & Cursor,
+`CLAUDE.md` for Claude Code. The rules go in a marker-wrapped block, so the rest
+of your file is left untouched.
 
 ## ⚡ Install
 
@@ -22,12 +23,13 @@ npx odoo-technical-plugins --list                # list plugins
 
 | Agent | Project | Global (`--global`) |
 |-------|---------|---------------------|
-| Claude Code | `.claude/skills/odoo-technical-rules/` | `~/.claude/skills/odoo-technical-rules/` |
-| Codex | `.codex/skills/odoo-technical-rules/` | `~/.codex/skills/odoo-technical-rules/` |
-| Cursor | `.cursor/skills/odoo-technical-rules/` | `~/.cursor/skills/odoo-technical-rules/` |
+| Codex | `AGENTS.md` | `~/.codex/AGENTS.md` |
+| Cursor | `AGENTS.md` | `~/.cursor/rules/odoo-technical-rules.mdc` |
+| Claude Code | `CLAUDE.md` | `~/.claude/CLAUDE.md` |
 
-All three read the same `SKILL.md`. (Cursor and Codex also auto-discover
-`.claude/skills/`, so a single Claude install is often picked up cross-tool.)
+`AGENTS.md` is the cross-tool standard (Codex + Cursor read it); Claude Code
+uses `CLAUDE.md`. Each install is a `<!-- BEGIN/END odoo-technical-rules -->`
+block, so other content in those files is preserved.
 
 ## Manage it (update · uninstall · status)
 
@@ -48,13 +50,10 @@ made by an older version), so cleanup stays reliable.
 
 ## Manual install
 
-The skill is just a folder — copy it yourself if you prefer:
-
-```bash
-mkdir -p /path/to/your-odoo-project/.claude/skills
-cp -r skills/odoo-technical-rules /path/to/your-odoo-project/.claude/skills/
-# or .codex/skills/ , or .cursor/skills/
-```
+The rules are plain Markdown — paste them yourself if you prefer. The text is the
+body of [`skills/odoo-technical-rules/SKILL.md`](skills/odoo-technical-rules/SKILL.md)
+(below the frontmatter). Add it to your project's `AGENTS.md` (Codex/Cursor) and/or
+`CLAUDE.md` (Claude Code).
 
 ## Customizing for your team
 

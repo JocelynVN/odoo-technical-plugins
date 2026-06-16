@@ -19,12 +19,12 @@ Both versions have identical content and are the **single source of truth**. The
 npx odoo-technical-plugins
 ```
 
-Installs as an Agent Skill into `.<agent>/skills/odoo-technical-rules/` (Claude / Codex / Cursor). See **[INSTALL.md](INSTALL.md)** for non-interactive flags and `update`/`uninstall`/`status`.
+Installs into your project's always-on instructions — `AGENTS.md` (Codex / Cursor) and `CLAUDE.md` (Claude Code) — so the rules load every session. See **[INSTALL.md](INSTALL.md)** for non-interactive flags and `update`/`uninstall`/`status`.
 
 ## Contents
 
 ```text
-skills/odoo-technical-rules/SKILL.md   # the Agent Skill (installed into .<agent>/skills/)
+skills/odoo-technical-rules/SKILL.md   # rules body, written into AGENTS.md / CLAUDE.md
 rules/technical-rules.{en,vi}.md       # full ruleset (single source)
 ```
 

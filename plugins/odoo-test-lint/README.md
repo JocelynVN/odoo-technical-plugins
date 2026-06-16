@@ -31,7 +31,7 @@ configs [`rules/eslintrc`](rules/eslintrc) and [`rules/pylintrc`](rules/pylintrc
 ## Contents
 
 ```text
-skills/odoo-test-lint/SKILL.md   # the Agent Skill (installed into .<agent>/skills/)
+skills/odoo-test-lint/SKILL.md   # rules body, written into AGENTS.md / CLAUDE.md
 rules/odoo-test-lint.md          # reference notes
 rules/eslintrc                   # Odoo's ESLint config (usable as-is)
 rules/pylintrc                   # standalone pylint config
