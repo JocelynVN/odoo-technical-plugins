@@ -553,10 +553,10 @@ async function cmdUninstall(args) {
   }
   console.log('');
   const removed = new Set(toRemove.map((e) => e.plugin + '|' + e.agent));
-  const remaining = collectInstalled(manifest, target, isGlobal).filter(
-    (e) => !removed.has(e.plugin + '|' + e.agent)
-  );
-  // Blocks still owned by a remaining install (e.g. shared AGENTS.md for codex+cursor).
+  // Which blocks are still owned by an install we're KEEPING (e.g. a shared
+  // AGENTS.md used by both codex and cursor). Use the manifest — it records what
+  // was actually installed; on-disk discovery can't tell who owns a shared file.
+  const remaining = (manifest.installs || []).filter((e) => !removed.has(e.plugin + '|' + e.agent));
   const keepBlocks = new Set();
   for (const e of remaining) for (const b of e.blocks || []) keepBlocks.add(`${b.file}|${b.marker}`);
   for (const e of toRemove) removeDescriptor(e, keepBlocks);

@@ -1,6 +1,6 @@
 {
   "name": "odoo-technical-plugins",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Interactive installer for Odoo technical plugins (Claude Code, Codex, Cursor).",
   "bin": {
     "odoo-technical-plugins": "bin/cli.js"
