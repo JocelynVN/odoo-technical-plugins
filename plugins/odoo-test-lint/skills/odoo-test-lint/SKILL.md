@@ -1,11 +1,11 @@
 ---
-name: odoo-lint
+name: odoo-test-lint
 description: Make AI-written Odoo code pass Odoo's official linters — the pylint checks enforced by Odoo's `test_lint` module (SQL-injection, gettext/translation, eval, deprecated modules, unlink override) and the ESLint rules from Odoo's `eslintrc` (no-undef, OWL static props/template, no private fields, translation placeholders). Use whenever writing or reviewing Odoo Python (`models/`, `controllers/`, `wizard/`) or JavaScript (`static/src/**/*.js`).
 ---
 
 # Odoo Lint Rules
 
-Write Python and JS that passes Odoo's own linters (`odoo/addons/test_lint`: `test_pylint.py` + `test_eslint.py` / `eslintrc`). Bundled configs you can use directly are next to this plugin under `rules/` (`eslintrc`, `pylintrc`); full notes in `rules/odoo-lint.md`.
+Write Python and JS that passes Odoo's own linters (`odoo/addons/test_lint`: `test_pylint.py` + `test_eslint.py` / `eslintrc`). Bundled configs you can use directly are next to this plugin under `rules/` (`eslintrc`, `pylintrc`); full notes in `rules/odoo-test-lint.md`.
 
 ## Python — pylint (the checks Odoo's `test_lint` enables)
 

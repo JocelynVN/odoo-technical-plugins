@@ -1,13 +1,7 @@
----
-description: Odoo lint rules — make Python & JS pass Odoo's official linters (test_lint pylint + ESLint).
-globs: ["**/models/**/*.py", "**/controllers/**/*.py", "**/wizard/**/*.py", "**/static/src/**/*.js"]
-alwaysApply: false
----
-
-# Odoo Lint Rules
+# Odoo Lint Rules (for Codex)
 
 Write Odoo Python and JS that passes Odoo's official linters (`odoo/addons/test_lint`).
-Full notes & configs: https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-lint/rules
+Full notes & ready-to-use configs: https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-test-lint/rules
 
 ## Python — pylint (checks Odoo's test_lint enables)
 - No `undefined-variable`, `used-before-assignment`, `unreachable` code, or `function-redefined`.
