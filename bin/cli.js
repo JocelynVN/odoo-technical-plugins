@@ -222,6 +222,65 @@ function removeDescriptor(entry) {
   }
 }
 
+/* --------------------- on-disk discovery (manifest-less) ---------------- */
+/* Detect what actually exists on disk for a plugin+agent, so we can clean up
+ * installs that predate manifest tracking or were done via the bash script. */
+
+function discover(plugin, agent, target, isGlobal) {
+  const base = isGlobal ? os.homedir() : target;
+  if (agent === 'claude') {
+    const skillDir = findSkillDir(plugin.dir);
+    if (!skillDir) return null;
+    const dest = path.join(base, '.claude', 'skills', path.basename(skillDir));
+    return fs.existsSync(dest) ? { paths: [dest], blocks: [] } : null;
+  }
+  if (agent === 'cursor') {
+    const srcDir = path.join(plugin.dir, 'dist', 'cursor', '.cursor', 'rules');
+    if (!fs.existsSync(srcDir)) return null;
+    const paths = fs
+      .readdirSync(srcDir)
+      .map((f) => path.join(base, '.cursor', 'rules', f))
+      .filter((p) => fs.existsSync(p));
+    return paths.length ? { paths, blocks: [] } : null;
+  }
+  if (agent === 'codex') {
+    const dest = path.join(base, 'AGENTS.md');
+    if (fs.existsSync(dest) && fs.readFileSync(dest, 'utf8').includes(`<!-- BEGIN ${plugin.name} -->`)) {
+      return { paths: [], blocks: [{ file: dest, marker: plugin.name }] };
+    }
+    return null;
+  }
+  return null;
+}
+
+// Union of manifest-tracked installs and on-disk discovery for a scope.
+function collectInstalled(manifest, target, isGlobal, filterPlugin, filterAgent) {
+  const out = [];
+  const seen = new Set();
+  const add = (e) => {
+    const k = e.plugin + '|' + e.agent;
+    if (!seen.has(k)) {
+      seen.add(k);
+      out.push(e);
+    }
+  };
+  const agentMatch = (a) => !filterAgent || filterAgent === 'all' || a === filterAgent;
+  for (const e of manifest.installs || []) {
+    if (filterPlugin && e.plugin !== filterPlugin) continue;
+    if (!agentMatch(e.agent)) continue;
+    add(e);
+  }
+  for (const p of loadPlugins()) {
+    if (filterPlugin && p.name !== filterPlugin) continue;
+    for (const a of ['claude', 'codex', 'cursor']) {
+      if (!agentMatch(a) || seen.has(p.name + '|' + a)) continue;
+      const d = discover(p, a, target, isGlobal);
+      if (d) add({ plugin: p.name, agent: a, version: 'untracked', ...d });
+    }
+  }
+  return out;
+}
+
 /* ------------------------------ manifest -------------------------------- */
 
 function manifestPath(target, isGlobal) {
@@ -342,28 +401,20 @@ function cmdList() {
   loadPlugins().forEach((p) => console.log(`  • ${p.name} ${C.d('— ' + p.description)}`));
 }
 
-function showManifest(label, p) {
-  if (!fs.existsSync(p)) return;
-  const m = loadManifest(p);
-  if (!m.installs.length) return;
-  console.log(C.bold(`\n${label}`) + C.d(`  (${p})`));
-  for (const e of m.installs) {
-    console.log(`  • ${e.plugin} ${C.d('→')} ${e.agent} ${C.d('v' + (e.version || '?'))}`);
-  }
-}
-
 function cmdStatus() {
   let any = false;
-  for (const [label, p] of [
-    ['Global', manifestPath(null, true)],
-    [`Project (${process.cwd()})`, manifestPath(process.cwd(), false)],
-  ]) {
-    if (fs.existsSync(p) && loadManifest(p).installs.length) {
-      any = true;
-      showManifest(label, p);
+  for (const isGlobal of [true, false]) {
+    const target = isGlobal ? null : process.cwd();
+    const items = collectInstalled(loadManifest(manifestPath(target, isGlobal)), target, isGlobal);
+    if (!items.length) continue;
+    any = true;
+    console.log(C.bold(`\n${isGlobal ? 'Global' : 'Project (' + process.cwd() + ')'}`));
+    for (const e of items) {
+      const tag = e.version === 'untracked' ? C.d(' (untracked)') : C.d(' v' + (e.version || '?'));
+      console.log(`  • ${e.plugin} ${C.d('→')} ${e.agent}${tag}`);
     }
   }
-  if (!any) console.log(C.d('Nothing installed in the global or current-project manifest.'));
+  if (!any) console.log(C.d('Nothing installed globally or in the current project.'));
 }
 
 async function cmdInstall(args) {
@@ -467,28 +518,32 @@ async function cmdUninstall(args) {
   const target = path.resolve(args.dir || '.');
   const mp = manifestPath(target, isGlobal);
   const manifest = loadManifest(mp);
-  if (!manifest.installs.length) {
-    console.log(C.y(`Nothing installed ${isGlobal ? 'globally' : 'in ' + target}.`));
-    return;
-  }
-  const toRemove = manifest.installs.filter(
-    (e) =>
-      (!args.plugin || e.plugin === args.plugin) &&
-      (!args.agent || args.agent === 'all' || e.agent === args.agent)
-  );
+  const toRemove = collectInstalled(manifest, target, isGlobal, args.plugin, args.agent);
   if (!toRemove.length) {
-    console.log(C.y('No matching install for the given --plugin/--agent.'));
+    console.log(C.y(`Nothing installed ${isGlobal ? 'globally' : 'in ' + target}.`));
+    const other = collectInstalled(loadManifest(manifestPath(target, !isGlobal)), target, !isGlobal);
+    if (other.length) {
+      console.log(
+        C.d(
+          `Tip: found install(s) ${isGlobal ? 'in this project' : 'globally'} — try ` +
+            `${isGlobal ? 'without --global' : 'with --global'}.`
+        )
+      );
+    }
     return;
   }
   console.log(C.bold('Will remove:'));
-  toRemove.forEach((e) => console.log(`  • ${e.plugin} → ${e.agent}`));
+  toRemove.forEach((e) =>
+    console.log(`  • ${e.plugin} → ${e.agent}${e.version === 'untracked' ? C.d(' (untracked)') : ''}`)
+  );
   if (!(await confirm('Proceed?', args.yes))) {
     console.log(C.d('Cancelled.'));
     return;
   }
   console.log('');
   for (const e of toRemove) removeDescriptor(e);
-  manifest.installs = manifest.installs.filter((e) => !toRemove.includes(e));
+  const removed = new Set(toRemove.map((e) => e.plugin + '|' + e.agent));
+  manifest.installs = (manifest.installs || []).filter((e) => !removed.has(e.plugin + '|' + e.agent));
   saveManifest(mp, manifest);
   console.log('\n' + C.g('Uninstalled.'));
 }
