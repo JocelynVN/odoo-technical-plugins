@@ -150,15 +150,80 @@ function ask(rl, q) {
   return new Promise((res) => rl.question(q, (a) => res(a.trim())));
 }
 
-async function choose(rl, title, options) {
-  console.log('\n' + C.bold(title));
-  options.forEach((o, i) => console.log(`  ${i + 1}) ${o.label}${o.hint ? '  ' + C.d(o.hint) : ''}`));
-  for (;;) {
-    const a = await ask(rl, C.b('> '));
-    const n = parseInt(a, 10);
-    if (n >= 1 && n <= options.length) return options[n - 1].value;
-    console.log(C.y('Please enter a number from the list.'));
-  }
+const KEY = { up: '\x1b[A', down: '\x1b[B', enter1: '\r', enter2: '\n', space: ' ', ctrlc: '\x03' };
+
+function renderMenu(message, choices, idx, selected, multi) {
+  const head =
+    C.bold(message) +
+    C.d(multi ? '   (↑/↓ move · space select · enter confirm)' : '   (↑/↓ move · enter select)');
+  const body = choices.map((c, i) => {
+    const cur = i === idx;
+    const pointer = cur ? C.g('❯') : ' ';
+    const box = multi ? (selected.has(i) ? C.g('◉') : '◯') + ' ' : '';
+    const label = cur ? C.g(c.label) : c.label;
+    const hint = c.hint ? '  ' + C.d(c.hint) : '';
+    return `${pointer} ${box}${label}${hint}`;
+  });
+  return [head, ...body];
+}
+
+// Arrow-key menu. Single-select returns a value; multi-select returns an array.
+function menu(message, choices, { multi = false } = {}) {
+  return new Promise((resolve) => {
+    const input = process.stdin;
+    const out = process.stdout;
+    let idx = 0;
+    let prev = 0;
+    const selected = new Set();
+
+    const draw = () => {
+      if (prev) out.write(`\x1b[${prev}A`);
+      out.write('\x1b[J');
+      const lines = renderMenu(message, choices, idx, selected, multi);
+      out.write(lines.join('\n') + '\n');
+      prev = lines.length;
+    };
+
+    const finish = (val) => {
+      input.setRawMode(false);
+      input.pause();
+      input.removeListener('data', onData);
+      out.write('\x1b[?25h');
+      resolve(val);
+    };
+
+    const onData = (buf) => {
+      const s = buf.toString();
+      if (s === KEY.ctrlc) {
+        finish();
+        out.write('\n');
+        process.exit(130);
+      } else if (s === KEY.up || s === 'k') {
+        idx = (idx - 1 + choices.length) % choices.length;
+        draw();
+      } else if (s === KEY.down || s === 'j') {
+        idx = (idx + 1) % choices.length;
+        draw();
+      } else if (multi && s === KEY.space) {
+        if (selected.has(idx)) selected.delete(idx);
+        else selected.add(idx);
+        draw();
+      } else if (s === KEY.enter1 || s === KEY.enter2) {
+        if (multi) {
+          if (!selected.size) return; // require at least one
+          finish([...selected].sort((a, b) => a - b).map((i) => choices[i].value));
+        } else {
+          finish(choices[idx].value);
+        }
+      }
+    };
+
+    out.write('\x1b[?25l');
+    input.setRawMode(true);
+    input.resume();
+    input.on('data', onData);
+    draw();
+  });
 }
 
 async function main() {
@@ -191,35 +256,41 @@ async function main() {
       console.log(C.y('No interactive terminal. Pass flags, e.g. --agent all. Try --help.'));
       process.exit(1);
     }
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-    console.log(C.bold('\n📦 Odoo Technical Plugins installer\n'));
+    console.log(C.bold('\n📦 Odoo Technical Plugins installer'));
 
     let chosen;
     if (plugins.length === 1) {
       chosen = plugins[0];
-      console.log(C.d(`Plugin: ${chosen.name} — ${chosen.description}`));
+      console.log(C.d(`\nPlugin: ${chosen.name} — ${chosen.description}`));
     } else {
-      chosen = await choose(rl, 'Which plugin?', plugins.map((p) => ({ label: p.name, hint: p.description, value: p })));
+      chosen = await menu(
+        'Which plugin?',
+        plugins.map((p) => ({ label: p.name, hint: p.description, value: p }))
+      );
     }
     chosenPlugins = [chosen];
 
-    agents = await choose(rl, 'Which AI agent?', [
-      { label: 'Claude Code', value: ['claude'] },
-      { label: 'Codex', value: ['codex'] },
-      { label: 'Cursor', value: ['cursor'] },
-      { label: 'All of them', value: ['claude', 'codex', 'cursor'] },
-    ]);
+    agents = await menu(
+      'Which AI agent(s)?',
+      [
+        { label: 'Claude Code', value: 'claude' },
+        { label: 'Codex', value: 'codex' },
+        { label: 'Cursor', value: 'cursor' },
+      ],
+      { multi: true }
+    );
 
-    isGlobal = await choose(rl, 'Install scope?', [
+    isGlobal = await menu('Install scope?', [
       { label: 'This project', hint: process.cwd(), value: false },
       { label: 'Global (all projects)', value: true },
     ]);
 
     if (!isGlobal) {
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
       const d = await ask(rl, `Project directory ${C.d('[' + process.cwd() + ']')}: `);
+      rl.close();
       target = path.resolve(d || '.');
     }
-    rl.close();
   }
 
   console.log('');
