@@ -12,20 +12,39 @@ This repository is a [Claude Code plugin marketplace](https://docs.claude.com/en
 
 > More plugins will be added here over time.
 
-## Install the marketplace (Claude Code)
+## Install
+
+### One command — any agent (recommended)
+
+Run the interactive installer from your project (no clone, no npm account needed):
+
+```bash
+npx github:JocelynVN/odoo-technical-plugins
+```
+
+It asks which plugin, which agent (Claude Code / Codex / Cursor / all), and the scope, then writes the right config (`.claude/skills/…`, `AGENTS.md`, or `.cursor/rules/…`). Non-interactive too:
+
+```bash
+npx github:JocelynVN/odoo-technical-plugins -- --agent all          # this project
+npx github:JocelynVN/odoo-technical-plugins -- --agent codex --global
+```
+
+### Claude Code marketplace (alternative)
 
 ```bash
 /plugin marketplace add JocelynVN/odoo-technical-plugins
 /plugin install odoo-technical-rules@odoo-technical-plugins
 ```
 
-Then browse available plugins with `/plugin`. For Codex and Cursor, each plugin ships its own ready-to-copy files — see that plugin's `INSTALL.md`.
+See each plugin's `INSTALL.md` for all options (including a `curl | bash` script).
 
 ## Repository layout
 
 ```text
 .claude-plugin/
   marketplace.json            # lists every plugin in this repo
+bin/cli.js                    # interactive npx installer
+package.json                  # makes `npx github:…` work
 plugins/
   odoo-technical-rules/       # plugin #1 (self-contained)
     .claude-plugin/plugin.json

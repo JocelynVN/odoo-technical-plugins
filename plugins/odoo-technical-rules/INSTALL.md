@@ -10,35 +10,34 @@ This plugin ships the Odoo technical rules in formats installable by **Claude Co
 
 The full ruleset lives in **one place** — [`rules/technical-rules.en.md`](rules/technical-rules.en.md) / [`rules/technical-rules.vi.md`](rules/technical-rules.vi.md). Each agent format embeds the same must-follow checklist and links back to these full docs (no duplicated copies).
 
-> **Heads-up:** unlike Claude Code, **Codex and Cursor have no plugin manager** — installing means dropping a config file into the right place. Use the one-line installer below so you don't do it by hand.
-
 ---
 
-## ⚡ One-line install (Codex & Cursor)
+## ⚡ Recommended: one interactive command
 
-No clone needed — run from your Odoo project directory:
-
-```bash
-# both Codex + Cursor, into the current project
-curl -fsSL https://raw.githubusercontent.com/JocelynVN/odoo-technical-plugins/main/plugins/odoo-technical-rules/install.sh | bash
-
-# only one agent
-curl -fsSL .../install.sh | bash -s -- codex
-curl -fsSL .../install.sh | bash -s -- cursor
-
-# install Codex config globally (~/.codex/AGENTS.md)
-curl -fsSL .../install.sh | bash -s -- codex global
-```
-
-From a local clone instead:
+Run from your Odoo project — no clone, no npm account:
 
 ```bash
-plugins/odoo-technical-rules/install.sh all /path/to/your-odoo-project
+npx github:JocelynVN/odoo-technical-plugins
 ```
 
-Usage: `install.sh <codex|cursor|all> [project-dir|global]` (defaults: `all` into the current dir). It's append-safe (won't duplicate an existing `AGENTS.md`) and idempotent.
+It prompts for the plugin, the agent (Claude Code / Codex / Cursor / all), and the scope, then writes the right files. Non-interactive:
 
-The sections below document the **manual** steps the script automates, in case you want full control.
+```bash
+npx github:JocelynVN/odoo-technical-plugins -- --agent all            # this project
+npx github:JocelynVN/odoo-technical-plugins -- --agent cursor
+npx github:JocelynVN/odoo-technical-plugins -- --agent codex --global
+npx github:JocelynVN/odoo-technical-plugins -- --list                 # list plugins
+```
+
+This is idempotent and append-safe (won't duplicate an existing `AGENTS.md`).
+
+> Prefer no Node? There's also a bash script for Codex & Cursor:
+> ```bash
+> curl -fsSL https://raw.githubusercontent.com/JocelynVN/odoo-technical-plugins/main/plugins/odoo-technical-rules/install.sh | bash
+> ```
+> Usage: `install.sh <codex|cursor|all> [project-dir|global]`.
+
+The sections below document everything the installers automate, plus the Claude Code marketplace flow and fully manual steps.
 
 ---
 

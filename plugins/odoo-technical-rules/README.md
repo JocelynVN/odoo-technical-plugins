@@ -13,20 +13,13 @@ Both versions have identical content and are the **single source of truth**. The
 
 ## 🔌 Install
 
-See **[INSTALL.md](INSTALL.md)** for per-agent steps (Claude Code / Codex / Cursor).
-
-Quick start for Claude Code:
+**One command, any agent** (interactive — pick Claude Code / Codex / Cursor):
 
 ```bash
-/plugin marketplace add JocelynVN/odoo-technical-plugins
-/plugin install odoo-technical-rules@odoo-technical-plugins
+npx github:JocelynVN/odoo-technical-plugins
 ```
 
-One-line install for Codex & Cursor (run from your Odoo project, no clone needed):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/JocelynVN/odoo-technical-plugins/main/plugins/odoo-technical-rules/install.sh | bash
-```
+See **[INSTALL.md](INSTALL.md)** for all options (non-interactive flags, Claude Code marketplace, `curl | bash` script, manual steps).
 
 ## Contents
 
