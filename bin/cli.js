@@ -435,7 +435,8 @@ async function cmdInstall(args) {
   let isGlobal = !!args.global;
   let target = path.resolve(args.dir || '.');
 
-  const nonInteractive = args.agent && (args.plugin || plugins.length === 1);
+  // Non-interactive as soon as --agent is given; --plugin is optional (defaults to all).
+  const nonInteractive = !!args.agent;
 
   if (nonInteractive) {
     chosenPlugins = args.plugin ? plugins.filter((p) => p.name === args.plugin) : plugins;
@@ -450,14 +451,16 @@ async function cmdInstall(args) {
       process.exit(1);
     }
     console.log(C.bold('\n📦 Odoo Technical Plugins installer'));
-    let chosen;
     if (plugins.length === 1) {
-      chosen = plugins[0];
-      console.log(C.d(`\nPlugin: ${chosen.name} — ${chosen.description}`));
+      chosenPlugins = plugins;
+      console.log(C.d(`\nPlugin: ${plugins[0].name} — ${plugins[0].description}`));
     } else {
-      chosen = await menu('Which plugin?', plugins.map((p) => ({ label: p.name, hint: p.description, value: p })));
+      chosenPlugins = await menu(
+        'Which plugin(s)?',
+        plugins.map((p) => ({ label: p.name, hint: p.description, value: p })),
+        { multi: true }
+      );
     }
-    chosenPlugins = [chosen];
     agents = await menu(
       'Which AI agent(s)?',
       [

@@ -23,7 +23,7 @@ npx odoo-technical-plugins@latest
 
 > The `@latest` tag bypasses npx's cache so you always get the newest rules.
 
-It asks which plugin, which agent (Claude Code / Codex / Cursor / all), and the scope, then writes the rules into each agent's **always-on instructions file** (loaded at the start of every session) as a marker-wrapped block that leaves the rest of the file untouched:
+It asks which plugin(s) and which agent(s) (multi-select with space) plus the scope, then writes the rules into each agent's **always-on instructions file** (loaded at the start of every session) as a marker-wrapped block that leaves the rest of the file untouched:
 
 | Agent | Project | Global |
 |-------|---------|--------|
