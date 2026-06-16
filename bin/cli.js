@@ -133,74 +133,39 @@ function home(...parts) {
 }
 
 /* ----------------------- per-agent write / remove ----------------------- */
-/* Each writer returns a descriptor: { paths:[...], blocks:[{file,marker}] }
- * - paths:  files/dirs we fully own (safe to delete on uninstall)
- * - blocks: marker-wrapped insertions inside a shared file (e.g. AGENTS.md) */
+/* All three agents support the Agent Skills standard (a SKILL.md directory),
+ * read from `.<agent>/skills/` (project) or `~/.<agent>/skills/` (global):
+ *   Claude → .claude/skills   Codex → .codex/skills   Cursor → .cursor/skills
+ * So we install the same skill folder into each. Descriptor: { paths, blocks }
+ * (blocks only used to clean up legacy <=1.4 AGENTS.md installs). */
 
-function writeClaude(plugin, target, isGlobal) {
+const AGENT_LABEL = { claude: 'Claude Code', codex: 'Codex', cursor: 'Cursor' };
+
+function installSkill(plugin, agent, target, isGlobal) {
   const skillDir = findSkillDir(plugin.dir);
   if (!skillDir) {
-    console.log(C.y('  Claude Code: no skill found, skipped.'));
+    console.log(C.y(`  ${AGENT_LABEL[agent]}: no skill found, skipped.`));
     return null;
   }
-  const dest = isGlobal
-    ? home('.claude', 'skills', path.basename(skillDir))
-    : path.join(target, '.claude', 'skills', path.basename(skillDir));
+  const base = isGlobal ? os.homedir() : target;
+  const dest = path.join(base, '.' + agent, 'skills', path.basename(skillDir));
   rmrf(dest);
   copyDir(skillDir, dest);
-  console.log(C.g(`  Claude Code: skill → ${dest}`));
+  console.log(C.g(`  ${AGENT_LABEL[agent]}: skill → ${dest}`));
   return { paths: [dest], blocks: [] };
 }
 
-function codexBlock(plugin) {
-  const src = path.join(plugin.dir, 'dist', 'codex', 'AGENTS.md');
-  if (!fs.existsSync(src)) return null;
-  const body = fs.readFileSync(src, 'utf8').trim();
-  return `<!-- BEGIN ${plugin.name} -->\n${body}\n<!-- END ${plugin.name} -->\n`;
-}
-
+// Kept for cleaning up legacy (<=1.4) marker-wrapped AGENTS.md installs.
 function stripBlock(text, marker) {
   const re = new RegExp(`\\n*<!-- BEGIN ${marker} -->[\\s\\S]*?<!-- END ${marker} -->\\n*`, 'g');
   return text.replace(re, '\n');
 }
 
-function writeCodex(plugin, target, isGlobal) {
-  const block = codexBlock(plugin);
-  if (!block) {
-    console.log(C.y('  Codex: no AGENTS.md, skipped.'));
-    return null;
-  }
-  const dest = isGlobal ? home('.codex', 'AGENTS.md') : path.join(target, 'AGENTS.md');
-  fs.mkdirSync(path.dirname(dest), { recursive: true });
-  const existed = fs.existsSync(dest);
-  const cur = existed ? fs.readFileSync(dest, 'utf8') : '';
-  const had = cur.includes(`<!-- BEGIN ${plugin.name} -->`);
-  const stripped = stripBlock(cur, plugin.name).trim();
-  const next = stripped ? `${stripped}\n\n${block}` : block;
-  fs.writeFileSync(dest, next);
-  console.log(C.g(`  Codex: ${had ? 'updated' : existed ? 'appended' : 'created'} → ${dest}`));
-  return { paths: [], blocks: [{ file: dest, marker: plugin.name }] };
-}
-
-function writeCursor(plugin, target, isGlobal) {
-  const srcDir = path.join(plugin.dir, 'dist', 'cursor', '.cursor', 'rules');
-  if (!fs.existsSync(srcDir)) {
-    console.log(C.y('  Cursor: no rules, skipped.'));
-    return null;
-  }
-  const destDir = isGlobal ? home('.cursor', 'rules') : path.join(target, '.cursor', 'rules');
-  fs.mkdirSync(destDir, { recursive: true });
-  const paths = [];
-  for (const f of fs.readdirSync(srcDir)) {
-    const dest = path.join(destDir, f);
-    fs.copyFileSync(path.join(srcDir, f), dest);
-    paths.push(dest);
-    console.log(C.g(`  Cursor: rule → ${dest}`));
-  }
-  return { paths, blocks: [] };
-}
-
-const WRITERS = { claude: writeClaude, codex: writeCodex, cursor: writeCursor };
+const WRITERS = {
+  claude: (p, t, g) => installSkill(p, 'claude', t, g),
+  codex: (p, t, g) => installSkill(p, 'codex', t, g),
+  cursor: (p, t, g) => installSkill(p, 'cursor', t, g),
+};
 
 function removeDescriptor(entry) {
   for (const p of entry.paths || []) {
@@ -228,57 +193,59 @@ function removeDescriptor(entry) {
 
 function discover(plugin, agent, target, isGlobal) {
   const base = isGlobal ? os.homedir() : target;
-  if (agent === 'claude') {
-    const skillDir = findSkillDir(plugin.dir);
-    if (!skillDir) return null;
-    const dest = path.join(base, '.claude', 'skills', path.basename(skillDir));
-    return fs.existsSync(dest) ? { paths: [dest], blocks: [] } : null;
-  }
-  if (agent === 'cursor') {
-    const srcDir = path.join(plugin.dir, 'dist', 'cursor', '.cursor', 'rules');
-    if (!fs.existsSync(srcDir)) return null;
-    const paths = fs
-      .readdirSync(srcDir)
-      .map((f) => path.join(base, '.cursor', 'rules', f))
-      .filter((p) => fs.existsSync(p));
-    return paths.length ? { paths, blocks: [] } : null;
-  }
+  const name = path.basename(findSkillDir(plugin.dir) || plugin.name);
+  const paths = [];
+  const blocks = [];
+
+  // current: skill dir under .<agent>/skills/
+  const skillDest = path.join(base, '.' + agent, 'skills', name);
+  if (fs.existsSync(skillDest)) paths.push(skillDest);
+
+  // legacy (<=1.4): Codex AGENTS.md marker block
   if (agent === 'codex') {
-    const dest = path.join(base, 'AGENTS.md');
-    if (fs.existsSync(dest) && fs.readFileSync(dest, 'utf8').includes(`<!-- BEGIN ${plugin.name} -->`)) {
-      return { paths: [], blocks: [{ file: dest, marker: plugin.name }] };
+    const ag = path.join(base, 'AGENTS.md');
+    if (fs.existsSync(ag) && fs.readFileSync(ag, 'utf8').includes(`<!-- BEGIN ${plugin.name} -->`)) {
+      blocks.push({ file: ag, marker: plugin.name });
     }
-    return null;
   }
-  return null;
+  // legacy (<=1.4): Cursor .cursor/rules/<name>.mdc
+  if (agent === 'cursor') {
+    const mdc = path.join(base, '.cursor', 'rules', `${plugin.name}.mdc`);
+    if (fs.existsSync(mdc)) paths.push(mdc);
+  }
+
+  return paths.length || blocks.length ? { paths, blocks } : null;
 }
 
 // Union of manifest-tracked installs and on-disk discovery for a scope.
+// For each plugin+agent we MERGE both sources (paths + blocks) so a leftover
+// legacy artifact is cleaned even when the manifest only knows the new skill.
 function collectInstalled(manifest, target, isGlobal, filterPlugin, filterAgent) {
-  const out = [];
-  const seen = new Set();
-  const add = (e) => {
-    const k = e.plugin + '|' + e.agent;
-    if (!seen.has(k)) {
-      seen.add(k);
-      out.push(e);
-    }
-  };
+  const byKey = new Map();
   const agentMatch = (a) => !filterAgent || filterAgent === 'all' || a === filterAgent;
+  const merge = (plugin, agent, version, paths = [], blocks = []) => {
+    const k = plugin + '|' + agent;
+    const e = byKey.get(k) || { plugin, agent, version: 'untracked', paths: [], blocks: [] };
+    for (const p of paths) if (!e.paths.includes(p)) e.paths.push(p);
+    for (const b of blocks) if (!e.blocks.some((x) => x.file === b.file && x.marker === b.marker)) e.blocks.push(b);
+    if (version && version !== 'untracked') e.version = version;
+    byKey.set(k, e);
+  };
+
   for (const e of manifest.installs || []) {
     if (filterPlugin && e.plugin !== filterPlugin) continue;
     if (!agentMatch(e.agent)) continue;
-    add(e);
+    merge(e.plugin, e.agent, e.version, e.paths, e.blocks);
   }
   for (const p of loadPlugins()) {
     if (filterPlugin && p.name !== filterPlugin) continue;
     for (const a of ['claude', 'codex', 'cursor']) {
-      if (!agentMatch(a) || seen.has(p.name + '|' + a)) continue;
+      if (!agentMatch(a)) continue;
       const d = discover(p, a, target, isGlobal);
-      if (d) add({ plugin: p.name, agent: a, version: 'untracked', ...d });
+      if (d) merge(p.name, a, null, d.paths, d.blocks);
     }
   }
-  return out;
+  return [...byKey.values()];
 }
 
 /* ------------------------------ manifest -------------------------------- */

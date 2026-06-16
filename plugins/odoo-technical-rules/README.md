@@ -19,15 +19,13 @@ Both versions have identical content and are the **single source of truth**. The
 npx odoo-technical-plugins
 ```
 
-See **[INSTALL.md](INSTALL.md)** for all options (non-interactive flags, `update`/`uninstall`/`status`, `curl | bash` script, manual steps).
+Installs as an Agent Skill into `.<agent>/skills/odoo-technical-rules/` (Claude / Codex / Cursor). See **[INSTALL.md](INSTALL.md)** for non-interactive flags and `update`/`uninstall`/`status`.
 
 ## Contents
 
 ```text
-skills/odoo-technical-rules/SKILL.md             # Claude Code skill (auto-activates on Odoo code)
-rules/technical-rules.{en,vi}.md                 # full ruleset (single source)
-dist/codex/AGENTS.md                             # ready-to-copy for Codex
-dist/cursor/.cursor/rules/odoo-technical-rules.mdc  # ready-to-copy for Cursor
+skills/odoo-technical-rules/SKILL.md   # the Agent Skill (installed into .<agent>/skills/)
+rules/technical-rules.{en,vi}.md       # full ruleset (single source)
 ```
 
 ## What's inside the rules

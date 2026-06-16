@@ -21,13 +21,15 @@ Run the interactive installer from your project:
 npx odoo-technical-plugins
 ```
 
-It asks which plugin, which agent (Claude Code / Codex / Cursor / all), and the scope, then writes the right config:
+It asks which plugin, which agent (Claude Code / Codex / Cursor / all), and the scope, then installs the plugin as an **Agent Skill** (a `SKILL.md` folder) into that agent's skills directory:
 
-- **Claude Code** → `.claude/skills/…` (project) or `~/.claude/skills/…` (global)
-- **Codex** → `AGENTS.md`
-- **Cursor** → `.cursor/rules/…`
+| Agent | Project | Global |
+|-------|---------|--------|
+| Claude Code | `.claude/skills/<plugin>/` | `~/.claude/skills/<plugin>/` |
+| Codex | `.codex/skills/<plugin>/` | `~/.codex/skills/<plugin>/` |
+| Cursor | `.cursor/skills/<plugin>/` | `~/.cursor/skills/<plugin>/` |
 
-Non-interactive too:
+All three read the same `SKILL.md` (the Agent Skills standard), so one format covers every agent. Non-interactive too:
 
 ```bash
 npx odoo-technical-plugins --agent all          # this project
@@ -44,8 +46,6 @@ npx odoo-technical-plugins update       # refresh to the latest rules
 npx odoo-technical-plugins uninstall    # remove cleanly
 ```
 
-See each plugin's `INSTALL.md` for all options (including a `curl | bash` script).
-
 ## Repository layout
 
 ```text
@@ -54,16 +54,15 @@ bin/cli.js                    # interactive npx installer (install/update/uninst
 package.json                  # makes `npx odoo-technical-plugins` work
 plugins/
   odoo-technical-rules/       # plugin #1 (self-contained)
-    skills/                   # Claude Code skill
-    rules/                    # full ruleset (en + vi) — single source of truth
-    dist/                     # ready-to-copy configs for Codex & Cursor
+    skills/<plugin>/SKILL.md  # the Agent Skill installed into .<agent>/skills/
+    rules/                    # full ruleset (en + vi) + reference material
     README.md
     INSTALL.md
 ```
 
 ## Adding a new plugin
 
-1. Create `plugins/<your-plugin>/` with its `skills/`, `rules/`, and `dist/` content.
+1. Create `plugins/<your-plugin>/skills/<your-plugin>/SKILL.md` (with `name` + `description` frontmatter).
 2. Add an entry to [`plugins.json`](plugins.json) → `plugins[]` (`name`, `source`, `description`).
 3. Add a row to the **Plugins** table above.
 

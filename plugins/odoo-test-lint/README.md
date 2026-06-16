@@ -31,10 +31,8 @@ configs [`rules/eslintrc`](rules/eslintrc) and [`rules/pylintrc`](rules/pylintrc
 ## Contents
 
 ```text
-skills/odoo-test-lint/SKILL.md                  # Claude Code skill (auto-activates on Odoo py/js)
-rules/odoo-test-lint.md                         # reference notes
-rules/eslintrc                             # Odoo's ESLint config (usable as-is)
-rules/pylintrc                             # standalone pylint config
-dist/codex/AGENTS.md                       # ready-to-copy for Codex
-dist/cursor/.cursor/rules/odoo-test-lint.mdc    # ready-to-copy for Cursor
+skills/odoo-test-lint/SKILL.md   # the Agent Skill (installed into .<agent>/skills/)
+rules/odoo-test-lint.md          # reference notes
+rules/eslintrc                   # Odoo's ESLint config (usable as-is)
+rules/pylintrc                   # standalone pylint config
 ```

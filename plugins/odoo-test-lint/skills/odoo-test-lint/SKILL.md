@@ -5,7 +5,8 @@ description: Make AI-written Odoo code pass Odoo's official linters — the pyli
 
 # Odoo Lint Rules
 
-Write Python and JS that passes Odoo's own linters (`odoo/addons/test_lint`: `test_pylint.py` + `test_eslint.py` / `eslintrc`). Bundled configs you can use directly are next to this plugin under `rules/` (`eslintrc`, `pylintrc`); full notes in `rules/odoo-test-lint.md`.
+Write Python and JS that passes Odoo's own linters (`odoo/addons/test_lint`: `test_pylint.py` + `test_eslint.py` / `eslintrc`). Ready-to-use lint configs and full notes:
+https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-test-lint/rules
 
 ## Python — pylint (the checks Odoo's `test_lint` enables)
 
@@ -25,7 +26,9 @@ Write Python and JS that passes Odoo's own linters (`odoo/addons/test_lint`: `te
 - `_t(...)` must not contain multiple unnamed `%s` placeholders — use named placeholders.
 - Never lint or commit third-party / minified libs (`/lib/` paths are excluded).
 
-## Configs in this plugin (`rules/`)
+## Ready-to-use configs
 
-- `rules/eslintrc` — Odoo's ESLint config, usable as-is: `eslint --no-eslintrc -c eslintrc <files>`.
-- `rules/pylintrc` — standalone pylint config approximating `test_lint` (note: Odoo's custom checkers live in Odoo source; install `pylint-odoo` for standalone SQL/gettext checks).
+In the plugin's [`rules/`](https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-test-lint/rules):
+
+- `eslintrc` — Odoo's ESLint config, usable as-is: `eslint --no-eslintrc -c eslintrc <files>`.
+- `pylintrc` — standalone pylint config approximating `test_lint` (note: Odoo's custom checkers live in Odoo source; install `pylint-odoo` for standalone SQL/gettext checks).

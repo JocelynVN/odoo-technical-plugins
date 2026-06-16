@@ -10,7 +10,7 @@ You are working in an Odoo codebase. Follow the rules below for any code you wri
 - English: https://github.com/JocelynVN/odoo-technical-plugins/blob/main/plugins/odoo-technical-rules/rules/technical-rules.en.md
 - Tiếng Việt: https://github.com/JocelynVN/odoo-technical-plugins/blob/main/plugins/odoo-technical-rules/rules/technical-rules.vi.md
 
-Within this plugin, those files are under `rules/` next to the skill (`../../rules/technical-rules.en.md`). Consult them before a non-trivial change.
+Consult those (links above) before a non-trivial change. The checklist below is enough for everyday work.
 
 ## Must-follow checklist
 
