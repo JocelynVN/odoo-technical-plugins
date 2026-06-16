@@ -4,7 +4,7 @@ This plugin ships the Odoo technical rules in formats installable by **Claude Co
 
 | Agent | Format | Path |
 |-------|--------|------|
-| Claude Code | Plugin (marketplace + skill) | `skills/odoo-technical-rules/SKILL.md` |
+| Claude Code | Skill (copied to `.claude/skills/`) | `skills/odoo-technical-rules/SKILL.md` |
 | Codex | `AGENTS.md` | `dist/codex/AGENTS.md` |
 | Cursor | Project rule (`.mdc`) | `dist/cursor/.cursor/rules/odoo-technical-rules.mdc` |
 
@@ -55,45 +55,29 @@ marker-wrapped block from a shared `AGENTS.md` (your other content stays).
 > ```
 > Usage: `install.sh <codex|cursor|all> [project-dir|global]`.
 
-The sections below document everything the installers automate, plus the Claude Code marketplace flow and fully manual steps.
+The sections below document where each installer writes files and the fully manual steps.
 
 ---
 
 ## 🟣 Claude Code
 
-The whole repo is a Claude Code plugin **marketplace** named `odoo-technical-plugins`; this is one plugin inside it.
+The installer copies the skill into Claude Code's skills directory:
 
-### Install from GitHub (recommended)
+- per project → `<project>/.claude/skills/odoo-technical-rules/`
+- global → `~/.claude/skills/odoo-technical-rules/`
 
 ```bash
-# inside Claude Code
-/plugin marketplace add JocelynVN/odoo-technical-plugins
-/plugin install odoo-technical-rules@odoo-technical-plugins
+npx odoo-technical-plugins --agent claude            # this project
+npx odoo-technical-plugins --agent claude --global   # all projects
 ```
 
-Then restart Claude Code (or `/plugin` → reload) and verify:
+The skill `odoo-technical-rules` activates automatically whenever you work on Odoo code (manifest, models, views, security…), and can be invoked explicitly with `/odoo-technical-rules`.
+
+### Manual (copy the skill yourself)
 
 ```bash
-/plugin                 # the plugin shows as enabled
-```
-
-The skill `odoo-technical-rules` activates automatically whenever you work on Odoo code (manifest, models, views, security…). You can also invoke it explicitly with `/odoo-technical-rules`.
-
-### Install from a local clone
-
-```bash
-git clone https://github.com/JocelynVN/odoo-technical-plugins
-# inside Claude Code:
-/plugin marketplace add /absolute/path/to/odoo-technical-plugins
-/plugin install odoo-technical-rules@odoo-technical-plugins
-```
-
-### Alternative: no plugin, just a CLAUDE.md rule
-
-If you prefer not to install a plugin, copy the checklist into your project's `CLAUDE.md` (or `~/.claude/CLAUDE.md` for all projects):
-
-```bash
-cat dist/codex/AGENTS.md >> /path/to/your-odoo-project/CLAUDE.md
+mkdir -p /path/to/your-odoo-project/.claude/skills
+cp -r skills/odoo-technical-rules /path/to/your-odoo-project/.claude/skills/
 ```
 
 > Claude Code also reads `AGENTS.md` at the project root, so the Codex file below works for Claude Code too.
@@ -158,8 +142,8 @@ npx odoo-technical-plugins --agent cursor --global
 
 When the rules change, re-pull this repo and:
 
-- **Claude Code**: `/plugin marketplace update odoo-technical-plugins` then `/plugin install` again.
-- **Codex / Cursor**: re-copy the file (or `git pull` if you symlinked it).
+- **Any agent**: `npx odoo-technical-plugins update` (or `--global`).
+- Manual copies: re-copy the file.
 
 ## Customizing for your team
 

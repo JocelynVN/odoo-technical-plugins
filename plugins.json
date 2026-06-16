@@ -1,16 +1,10 @@
 {
   "name": "odoo-technical-plugins",
-  "owner": {
-    "name": "JocelynVN",
-    "url": "https://github.com/JocelynVN"
-  },
-  "metadata": {
-    "description": "A marketplace of technical plugins for Odoo development. Each plugin lives under plugins/."
-  },
+  "description": "A collection of technical plugins for Odoo development, installed via npx.",
   "plugins": [
     {
       "name": "odoo-technical-rules",
-      "source": "./plugins/odoo-technical-rules",
+      "source": "plugins/odoo-technical-rules",
       "description": "Apply general Odoo technical rules (naming, manifest, views, Python/ORM, security, commits, stable policy) when writing or reviewing Odoo module code."
     }
   ]

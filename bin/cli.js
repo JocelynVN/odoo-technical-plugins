@@ -40,7 +40,7 @@ function readJSON(p) {
 }
 
 function loadPlugins() {
-  const data = readJSON(path.join(ROOT, '.claude-plugin', 'marketplace.json'));
+  const data = readJSON(path.join(ROOT, 'plugins.json'));
   return (data.plugins || []).map((p) => ({
     name: p.name,
     dir: path.resolve(ROOT, p.source),

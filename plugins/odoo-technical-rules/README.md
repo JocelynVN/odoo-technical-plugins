@@ -1,6 +1,6 @@
 # odoo-technical-rules
 
-A general, **vendor-neutral** technical ruleset for Odoo module development, packaged as an AI-agent plugin. Part of the [odoo-technical-plugins](../../README.md) marketplace.
+A general, **vendor-neutral** technical ruleset for Odoo module development, packaged as an AI-agent plugin. Part of the [odoo-technical-plugins](../../README.md) collection.
 
 ## 📖 The rules
 
@@ -19,12 +19,11 @@ Both versions have identical content and are the **single source of truth**. The
 npx odoo-technical-plugins
 ```
 
-See **[INSTALL.md](INSTALL.md)** for all options (non-interactive flags, Claude Code marketplace, `curl | bash` script, manual steps).
+See **[INSTALL.md](INSTALL.md)** for all options (non-interactive flags, `update`/`uninstall`/`status`, `curl | bash` script, manual steps).
 
 ## Contents
 
 ```text
-.claude-plugin/plugin.json                       # plugin manifest
 skills/odoo-technical-rules/SKILL.md             # Claude Code skill (auto-activates on Odoo code)
 rules/technical-rules.{en,vi}.md                 # full ruleset (single source)
 dist/codex/AGENTS.md                             # ready-to-copy for Codex
