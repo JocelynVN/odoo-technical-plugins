@@ -49,3 +49,12 @@ Consult those (links above) before a non-trivial change. The checklist below is 
 
 **Stable policy**
 - On released versions (`16.0`, `17.0`, ...): no schema/data-model changes, no method renames, no xml_id changes or data-record deletions, no new required args. When logic affects existing data, write a migration in the module.
+
+## Required workflow
+
+Whenever a task touches Odoo code, before you report it as done you MUST:
+
+1. Re-read the checklist above and verify your changes comply with every applicable item.
+2. Fix any violation you find. If something can't comply, state the reason explicitly.
+
+Do not consider the task complete while a known rule is violated.

@@ -32,3 +32,15 @@ In the plugin's [`rules/`](https://github.com/JocelynVN/odoo-technical-plugins/t
 
 - `eslintrc` — Odoo's ESLint config, usable as-is: `eslint --no-eslintrc -c eslintrc <files>`.
 - `pylintrc` — standalone pylint config approximating `test_lint` (note: Odoo's custom checkers live in Odoo source; install `pylint-odoo` for standalone SQL/gettext checks).
+
+## Required workflow
+
+After you write or modify any Python or JavaScript in an Odoo module, before you report the task as done you MUST:
+
+1. **Run the linters on the files you changed:**
+   - Python → `pylint` (use the project's config, or this plugin's `pylintrc`). Install with `pip install pylint pylint-odoo` if missing.
+   - JavaScript → `eslint` (use the project's config, or this plugin's `eslintrc`).
+2. **Fix every reported error.** Re-run until clean.
+3. If a linter isn't installed or can't run, **say so explicitly** and list what you checked manually against the rules above — don't silently skip it.
+
+Do not consider the task complete while lint errors remain.
