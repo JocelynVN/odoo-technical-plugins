@@ -1,11 +1,11 @@
 {
-  "name": "odoo-technical-rules",
+  "name": "odoo-technical-plugins",
   "owner": {
     "name": "JocelynVN",
     "url": "https://github.com/JocelynVN"
   },
   "metadata": {
-    "description": "General, vendor-neutral technical rules for Odoo module development."
+    "description": "A marketplace of technical plugins for Odoo development. Each plugin lives under plugins/."
   },
   "plugins": [
     {

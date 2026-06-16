@@ -1,27 +1,27 @@
-# Installation guide
+# Installation guide — odoo-technical-rules
 
-This repo ships the Odoo technical rules in formats installable by **Claude Code**, **Codex**, and **Cursor**.
+This plugin ships the Odoo technical rules in formats installable by **Claude Code**, **Codex**, and **Cursor**. Paths below are relative to this plugin folder (`plugins/odoo-technical-rules/`).
 
-| Agent | Format | Path in this repo |
-|-------|--------|-------------------|
-| Claude Code | Plugin (marketplace + skill) | `.claude-plugin/marketplace.json`, `plugins/odoo-technical-rules/` |
+| Agent | Format | Path |
+|-------|--------|------|
+| Claude Code | Plugin (marketplace + skill) | `skills/odoo-technical-rules/SKILL.md` |
 | Codex | `AGENTS.md` | `dist/codex/AGENTS.md` |
 | Cursor | Project rule (`.mdc`) | `dist/cursor/.cursor/rules/odoo-technical-rules.mdc` |
 
-The full ruleset lives in **one place** — [`technical-rules.en.md`](technical-rules.en.md) / [`technical-rules.vi.md`](technical-rules.vi.md). Each agent format above embeds the same must-follow checklist and links back to these full docs (no duplicated copies).
+The full ruleset lives in **one place** — [`rules/technical-rules.en.md`](rules/technical-rules.en.md) / [`rules/technical-rules.vi.md`](rules/technical-rules.vi.md). Each agent format embeds the same must-follow checklist and links back to these full docs (no duplicated copies).
 
 ---
 
 ## 🟣 Claude Code
 
-This repo **is** a Claude Code plugin marketplace.
+The whole repo is a Claude Code plugin **marketplace** named `odoo-technical-plugins`; this is one plugin inside it.
 
 ### Install from GitHub (recommended)
 
 ```bash
 # inside Claude Code
-/plugin marketplace add JocelynVN/odoo-technical-rules
-/plugin install odoo-technical-rules@odoo-technical-rules
+/plugin marketplace add JocelynVN/odoo-technical-plugins
+/plugin install odoo-technical-rules@odoo-technical-plugins
 ```
 
 Then restart Claude Code (or `/plugin` → reload) and verify:
@@ -35,10 +35,10 @@ The skill `odoo-technical-rules` activates automatically whenever you work on Od
 ### Install from a local clone
 
 ```bash
-git clone https://github.com/JocelynVN/odoo-technical-rules
+git clone https://github.com/JocelynVN/odoo-technical-plugins
 # inside Claude Code:
-/plugin marketplace add /absolute/path/to/odoo-technical-rules
-/plugin install odoo-technical-rules@odoo-technical-rules
+/plugin marketplace add /absolute/path/to/odoo-technical-plugins
+/plugin install odoo-technical-rules@odoo-technical-plugins
 ```
 
 ### Alternative: no plugin, just a CLAUDE.md rule
@@ -106,7 +106,7 @@ Cursor → **Settings → Rules → User Rules** → paste the body of
 
 When the rules change, re-pull this repo and:
 
-- **Claude Code**: `/plugin marketplace update odoo-technical-rules` then `/plugin install` again.
+- **Claude Code**: `/plugin marketplace update odoo-technical-plugins` then `/plugin install` again.
 - **Codex / Cursor**: re-copy the file (or `git pull` if you symlinked it).
 
 ## Customizing for your team

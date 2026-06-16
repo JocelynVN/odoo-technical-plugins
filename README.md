@@ -1,37 +1,43 @@
-# Odoo Technical Rules
+# Odoo Technical Plugins
 
-A general, **vendor-neutral** technical ruleset for Odoo module development. Fork it and adapt it to your team/project.
+A **marketplace of technical plugins for Odoo development**, installable by AI coding agents (Claude Code, Codex, Cursor).
 
-## 📖 Read the rules
+This repository is a [Claude Code plugin marketplace](https://docs.claude.com/en/docs/claude-code/plugins): the root holds the marketplace manifest, and each plugin is self-contained under [`plugins/`](plugins).
 
-| Language | File |
-|----------|------|
-| 🇻🇳 Tiếng Việt | [technical-rules.vi.md](technical-rules.vi.md) |
-| 🇬🇧 English | [technical-rules.en.md](technical-rules.en.md) |
+## Plugins
 
-Both versions have identical content and cross-link to each other.
+| Plugin | Description | Docs |
+|--------|-------------|------|
+| [`odoo-technical-rules`](plugins/odoo-technical-rules) | General, vendor-neutral Odoo coding rules (naming, manifest, views, Python/ORM, security, commits, stable policy). VI + EN. | [README](plugins/odoo-technical-rules/README.md) · [Install](plugins/odoo-technical-rules/INSTALL.md) |
 
-## 🔌 Install as an AI-agent plugin
+> More plugins will be added here over time.
 
-These rules ship ready to install for **Claude Code**, **Codex**, and **Cursor** — see **[INSTALL.md](INSTALL.md)** for per-agent steps.
-
-Quick start for Claude Code:
+## Install the marketplace (Claude Code)
 
 ```bash
-/plugin marketplace add JocelynVN/odoo-technical-rules
-/plugin install odoo-technical-rules@odoo-technical-rules
+/plugin marketplace add JocelynVN/odoo-technical-plugins
+/plugin install odoo-technical-rules@odoo-technical-plugins
 ```
 
-| Agent | Format | Path |
-|-------|--------|------|
-| Claude Code | Plugin (marketplace + skill) | [`plugins/odoo-technical-rules/`](plugins/odoo-technical-rules) |
-| Codex | `AGENTS.md` | [`dist/codex/AGENTS.md`](dist/codex/AGENTS.md) |
-| Cursor | Project rule (`.mdc`) | [`dist/cursor/.cursor/rules/odoo-technical-rules.mdc`](dist/cursor/.cursor/rules/odoo-technical-rules.mdc) |
+Then browse available plugins with `/plugin`. For Codex and Cursor, each plugin ships its own ready-to-copy files — see that plugin's `INSTALL.md`.
 
-## What's inside
+## Repository layout
 
-Conventions and best practices covering: development environment, source control, module & manifest structure, directory/file layout, models & fields, XML/views/data, Python, JavaScript & CSS, security, automation tests, external dependencies, migrations & hooks, UX/UI, i18n, commit messages, pull requests, branch naming, and stable-version policy.
+```text
+.claude-plugin/
+  marketplace.json            # lists every plugin in this repo
+plugins/
+  odoo-technical-rules/       # plugin #1 (self-contained)
+    .claude-plugin/plugin.json
+    skills/                   # Claude Code skill
+    rules/                    # full ruleset (en + vi) — single source of truth
+    dist/                     # ready-to-copy configs for Codex & Cursor
+    README.md
+    INSTALL.md
+```
 
-## License
+## Adding a new plugin
 
-These rules are documentation — adapt freely. Add your team's own conventions at the end of either file as needed.
+1. Create `plugins/<your-plugin>/` with its own `.claude-plugin/plugin.json`.
+2. Add an entry to `.claude-plugin/marketplace.json` → `plugins[]`.
+3. Add a row to the **Plugins** table above.

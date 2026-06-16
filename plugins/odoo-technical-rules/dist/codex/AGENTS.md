@@ -1,7 +1,7 @@
 # Odoo Technical Rules (for Codex)
 
 Apply these rules when writing or reviewing Odoo module code in this project.
-Full ruleset: https://github.com/JocelynVN/odoo-technical-rules
+Full ruleset: https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-technical-rules/rules
 
 ## Module & manifest
 - Technical name: lowercase `[a-z0-9_]`, team prefix `<prefix>_`. Extensions: `<prefix>_<base_module>_<feature>`. Localization: `l10n_<cc>_<prefix>_xxx`.

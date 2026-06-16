@@ -6,7 +6,7 @@
     "name": "JocelynVN",
     "url": "https://github.com/JocelynVN"
   },
-  "homepage": "https://github.com/JocelynVN/odoo-technical-rules",
+  "homepage": "https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-technical-rules",
   "license": "MIT",
   "keywords": ["odoo", "coding-rules", "guidelines", "python", "owl"]
 }
