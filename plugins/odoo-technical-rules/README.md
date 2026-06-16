@@ -16,7 +16,7 @@ Both versions have identical content and are the **single source of truth**. The
 **One command, any agent** (interactive — pick Claude Code / Codex / Cursor):
 
 ```bash
-npx odoo-technical-plugins
+npx odoo-technical-plugins@latest
 ```
 
 Installs into your project's always-on instructions — `AGENTS.md` (Codex / Cursor) and `CLAUDE.md` (Claude Code) — so the rules load every session. See **[INSTALL.md](INSTALL.md)** for non-interactive flags and `update`/`uninstall`/`status`.

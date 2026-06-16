@@ -18,8 +18,10 @@ Each plugin is self-contained under [`plugins/`](plugins); the [`npx` installer]
 Run the interactive installer from your project:
 
 ```bash
-npx odoo-technical-plugins
+npx odoo-technical-plugins@latest
 ```
+
+> The `@latest` tag bypasses npx's cache so you always get the newest rules.
 
 It asks which plugin, which agent (Claude Code / Codex / Cursor / all), and the scope, then writes the rules into each agent's **always-on instructions file** (loaded at the start of every session) as a marker-wrapped block that leaves the rest of the file untouched:
 
@@ -41,10 +43,14 @@ npx odoo-technical-plugins --agent codex --global
 It's a full lifecycle manager — installs are tracked in a manifest so you can refresh or remove them cleanly:
 
 ```bash
-npx odoo-technical-plugins status       # what's installed (project + global)
-npx odoo-technical-plugins update       # refresh to the latest rules
-npx odoo-technical-plugins uninstall    # remove cleanly
+npx odoo-technical-plugins status               # what's installed (project + global)
+npx odoo-technical-plugins@latest update        # refresh to the latest rules
+npx odoo-technical-plugins uninstall            # remove cleanly
 ```
+
+> **Customizing:** the installed rules sit in a `<!-- BEGIN/END <plugin> -->` block
+> that `update` overwrites — keep team tweaks **outside** that block (elsewhere in
+> your `AGENTS.md` / `CLAUDE.md`), or they'll be replaced on the next update.
 
 ## Repository layout
 

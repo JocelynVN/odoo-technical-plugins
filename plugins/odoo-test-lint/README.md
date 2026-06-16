@@ -10,10 +10,10 @@ module and the ESLint rules from Odoo's `eslintrc`. Part of the
 **One command, any agent** (Claude Code / Codex / Cursor):
 
 ```bash
-npx odoo-technical-plugins --plugin odoo-test-lint
+npx odoo-technical-plugins@latest --plugin odoo-test-lint
 ```
 
-Or run `npx odoo-technical-plugins` and pick `odoo-test-lint` from the menu.
+Or run `npx odoo-technical-plugins@latest` and pick `odoo-test-lint` from the menu.
 
 ## What it enforces
 

@@ -10,13 +10,14 @@ of your file is left untouched.
 Run from your Odoo project:
 
 ```bash
-npx odoo-technical-plugins                       # interactive: pick plugin + agent + scope
-npx odoo-technical-plugins --agent all           # this project, every agent
-npx odoo-technical-plugins --agent cursor
-npx odoo-technical-plugins --agent codex --global
-npx odoo-technical-plugins --list                # list plugins
+npx odoo-technical-plugins@latest                       # interactive: pick plugin + agent + scope
+npx odoo-technical-plugins@latest --agent all           # this project, every agent
+npx odoo-technical-plugins@latest --agent cursor
+npx odoo-technical-plugins@latest --agent codex --global
+npx odoo-technical-plugins@latest --list                # list plugins
 ```
 
+> The `@latest` tag bypasses npx's cache so you always pull the newest version.
 > Prefer the GitHub source over npm? `npx github:JocelynVN/odoo-technical-plugins -- <flags>` works identically.
 
 ### Where it installs
@@ -38,15 +39,17 @@ Installs are tracked in a manifest (`.odoo-technical-plugins.json` per project,
 
 ```bash
 npx odoo-technical-plugins status                 # what's installed (project + global)
-npx odoo-technical-plugins update                 # refresh installed skills to the latest
-npx odoo-technical-plugins update --global
+npx odoo-technical-plugins@latest update          # refresh installed rules to the latest
+npx odoo-technical-plugins@latest update --global
 npx odoo-technical-plugins uninstall              # remove everything tracked here
 npx odoo-technical-plugins uninstall --agent cursor
 npx odoo-technical-plugins uninstall --global --yes
 ```
 
-`uninstall`/`status` also detect installs on disk even without a manifest (e.g.
-made by an older version), so cleanup stays reliable.
+`update` rewrites each tracked block in place with the latest version's rules
+(use `@latest` so npx fetches the newest package, not a cached one). `uninstall`/
+`status` also detect installs on disk even without a manifest (e.g. made by an
+older version), so cleanup stays reliable.
 
 ## Manual install
 
@@ -57,6 +60,17 @@ body of [`skills/odoo-technical-rules/SKILL.md`](skills/odoo-technical-rules/SKI
 
 ## Customizing for your team
 
+> ⚠️ **`update` overwrites the managed block.** The installed rules live between
+> `<!-- BEGIN odoo-technical-rules -->` and `<!-- END odoo-technical-rules -->`.
+> Running `update` replaces everything inside those markers, so **don't edit
+> inside the block** — any changes there (e.g. replacing `<prefix>`) are lost on
+> the next update.
+>
+> Put team-specific rules and overrides **outside** the markers (elsewhere in
+> your `AGENTS.md` / `CLAUDE.md`) — that content is never touched by
+> `update`/`uninstall`. If you need to change the rule text itself, fork the
+> plugin instead.
+
 The full ruleset lives in [`rules/technical-rules.en.md`](rules/technical-rules.en.md) /
-[`rules/technical-rules.vi.md`](rules/technical-rules.vi.md). Replace placeholders:
+[`rules/technical-rules.vi.md`](rules/technical-rules.vi.md). Placeholders to adapt:
 `<prefix>` → your module prefix, `<odoo_version>` → your target version.
