@@ -455,7 +455,7 @@ def action_confirm(self):
 - Khi lặp recordset, đặt biến là `record` (hoặc `rec`) nếu là instance của model hiện hành; nếu không thì đặt tên khác.
 - Dùng `%(varname)s` (named) thay cho positional `%s` để dễ đọc & dễ dịch.
 - Không dùng tiền tố `_compute`/`compute` cho method không phải compute field.
-- Nháy đơn cho string/key của dict/tuple/list; nháy kép cho message, help hiển thị cho người dùng.
+- Nháy đơn `'...'` cho string thường & key của dict/tuple/list. Nháy kép `"..."` cho mọi chuỗi **hiển thị cho người dùng** — đối số của `_()` (hoặc `self.env._()`), message trong `UserError` / `ValidationError` / v.v., và `string` / `help` của field. Ví dụ: `raise ValidationError(_("Login failed or no cookies returned"))`.
 - Docstring dùng `"""..."""`.
 
 ---
