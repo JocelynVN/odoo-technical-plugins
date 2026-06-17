@@ -578,7 +578,7 @@ except (ImportError, IOError) as err:
 
 ## 16. Pull Request
 
-- Tiền tố PR giống commit, **thêm phiên bản** sau tiền tố, ví dụ: `[UPG] [<odoo_version>] <module_name>`.
+- Tiêu đề PR bắt đầu bằng **phiên bản Odoo, rồi tới tiền tố commit** (hai cặp ngoặc dính liền, không có dấu cách), sau đó là tên module: `[<odoo_version>][<PREFIX>] <module_name>` (ví dụ: `[18.0][IMP] sale_discount`).
 - Dùng tiền tố `[WIP]` khi đang làm dở.
 - Cấu hình **đúng tên & email Git** trước khi commit.
 - PR phải có **mô tả rõ ràng** hoặc link tới mô tả chi tiết.

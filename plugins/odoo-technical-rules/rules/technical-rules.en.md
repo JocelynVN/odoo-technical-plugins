@@ -578,7 +578,7 @@ except (ImportError, IOError) as err:
 
 ## 16. Pull request
 
-- The PR prefix is like a commit's, **with the version added** after the prefix, e.g. `[UPG] [<odoo_version>] <module_name>`.
+- The PR title starts with the **Odoo version, then the commit prefix** (the two brackets joined, no space), then the module name: `[<odoo_version>][<PREFIX>] <module_name>` (e.g. `[18.0][IMP] sale_discount`).
 - Use the `[WIP]` prefix while work is in progress.
 - Configure the **correct Git name & email** before committing.
 - A PR must have a **clear description** or link to a detailed one.

@@ -1,6 +1,6 @@
 ---
 name: odoo-technical-rules
-description: Apply the project's general Odoo technical rules when writing, modifying, or reviewing Odoo module code — module/manifest naming, directory & per-component static layout, models & fields, XML/views (minimum list+kanban+form+search), Python & ORM safety, docstrings (flake8-docstrings/PEP 257), security, tests, commit messages, branch names, and stable-version policy. Use whenever the task touches an Odoo addon (`__manifest__.py`, `models/`, `views/`, `.xml`, `ir.model.access.csv`, etc.).
+description: Apply the project's general Odoo technical rules when writing, modifying, or reviewing Odoo module code — module/manifest naming, directory & per-component static layout, models & fields, XML/views (minimum list+kanban+form+search), Python & ORM safety, docstrings (flake8-docstrings/PEP 257), security, tests, commit messages, branch names, pull-request titles, and stable-version policy. Use whenever the task touches an Odoo addon (`__manifest__.py`, `models/`, `views/`, `.xml`, `ir.model.access.csv`, etc.).
 ---
 
 # Odoo Technical Rules
@@ -47,6 +47,7 @@ Consult those (links above) before a non-trivial change. The checklist below is 
 **Commits & branches**
 - English commits prefixed `[IMP] [FIX] [ADD] [REM] [REN] [MIG] [UPG] [I18N] [MERGE] [MISC]`, with the module name in the title (e.g. `[FIX] sale_discount: prevent negative percentage`).
 - Branch: `v<odoo_version>_<fix|upg|add|rem|imp>_<module_name>` or `v<odoo_version>_<feature_name>` (e.g. `v18.0_fix_sale_discount`).
+- PR title: Odoo version then the commit prefix (brackets joined, no space) + module name: `[<odoo_version>][<PREFIX>] <module_name>` (e.g. `[18.0][IMP] sale_discount`). Use `[WIP]` while in progress.
 
 **Stable policy**
 - On released versions (`16.0`, `17.0`, ...): no schema/data-model changes, no method renames, no xml_id changes or data-record deletions, no new required args. When logic affects existing data, write a migration in the module.
