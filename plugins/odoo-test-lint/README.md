@@ -15,6 +15,26 @@ npx odoo-technical-plugins@latest --plugin odoo-test-lint
 
 Or run `npx odoo-technical-plugins@latest` and pick `odoo-test-lint` from the menu.
 
+## 🔎 How to run the checks (Odoo's own linters)
+
+Odoo's `test_lint` isn't a standalone tool — its Python checks are **pylint
+plugins** that live in the Odoo source you already have
+(`odoo/addons/test_lint/tests/_odoo_checker_*.py`), and its JS check is an
+**ESLint** config. Odoo doesn't ship pylint/eslint, so install the linter and
+point it at Odoo's own checkers via the configs in [`rules/`](rules):
+
+```bash
+pip install "pylint>=3.0"
+pylint --rcfile=rules/pylintrc path/to/your_module          # runs Odoo's real checkers
+npx --yes eslint@8 --no-eslintrc -c rules/eslintrc "your_module/static/src/**/*.js"
+```
+
+The bundled [`rules/pylintrc`](rules/pylintrc) loads Odoo's exact checker plugins
+(`_odoo_checker_sql_injection`, `_odoo_checker_gettext`,
+`_odoo_checker_unlink_override`) and enables the same messages Odoo CI does, so
+you get the authentic `E8501`/`E8502`/`E8503`/`E8505`/`E8506` checks — not a
+reimplementation. See [`rules/odoo-test-lint.md`](rules/odoo-test-lint.md) for details.
+
 ## What it enforces
 
 - **Python (pylint):** no undefined/used-before-assignment/unreachable/redefined,
@@ -34,5 +54,5 @@ configs [`rules/eslintrc`](rules/eslintrc) and [`rules/pylintrc`](rules/pylintrc
 skills/odoo-test-lint/SKILL.md   # rules body, written into AGENTS.md / CLAUDE.md
 rules/odoo-test-lint.md          # reference notes
 rules/eslintrc                   # Odoo's ESLint config (usable as-is)
-rules/pylintrc                   # standalone pylint config
+rules/pylintrc                   # pylint config that loads Odoo's own checkers
 ```

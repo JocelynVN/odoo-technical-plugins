@@ -26,21 +26,49 @@ https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-test-
 - `_t(...)` must not contain multiple unnamed `%s` placeholders — use named placeholders.
 - Never lint or commit third-party / minified libs (`/lib/` paths are excluded).
 
-## Ready-to-use configs
+## How to actually run these checks (use Odoo's own linters)
 
-In the plugin's [`rules/`](https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-test-lint/rules):
+Odoo's `test_lint` is **not** a standalone linter — its Python checks are
+**pylint plugins** living in the Odoo source you already have
+(`odoo/addons/test_lint/tests/_odoo_checker_*.py`), and its JS check is an
+**ESLint** config. Odoo does not ship pylint/eslint in `requirements.txt`, and
+its own test silently *skips* when they're missing — so you must install the
+linter, then point it at Odoo's own checkers. Two ready-to-use configs ship in
+this plugin's [`rules/`](https://github.com/JocelynVN/odoo-technical-plugins/tree/main/plugins/odoo-test-lint/rules).
 
-- `eslintrc` — Odoo's ESLint config, usable as-is: `eslint --no-eslintrc -c eslintrc <files>`.
-- `pylintrc` — standalone pylint config approximating `test_lint` (note: Odoo's custom checkers live in Odoo source; install `pylint-odoo` for standalone SQL/gettext checks).
+**Python — pylint loading Odoo's real checkers** (exact same checks as Odoo CI):
+
+```bash
+pip install "pylint>=3.0"                 # one-time; Odoo doesn't bundle it
+pylint --rcfile=<this plugin's rules/pylintrc> path/to/your_module
+```
+
+The bundled `pylintrc` already lists Odoo's plugins
+(`_odoo_checker_sql_injection`, `_odoo_checker_gettext`,
+`_odoo_checker_unlink_override` + `bad_builtin`) and the exact messages Odoo
+enables; its `init-hook` finds those modules next to the importable `odoo`
+package. If `odoo` isn't importable, prepend the source path instead:
+`PYTHONPATH="/path/to/odoo/odoo/addons/test_lint/tests:$PYTHONPATH"`.
+(No Odoo source handy? `pip install pylint-odoo` and swap the three
+`_odoo_checker_*` plugins for `pylint_odoo` in the rcfile.)
+
+**JavaScript — ESLint with Odoo's config:**
+
+```bash
+npx --yes eslint@8 --no-eslintrc -c <this plugin's rules/eslintrc> \
+    "your_module/static/src/**/*.js"     # skip /lib/ and *.min.js
+```
 
 ## Required workflow
 
-After you write or modify any Python or JavaScript in an Odoo module, before you report the task as done you MUST:
+After you write or modify any Python or JavaScript in an Odoo module, before you
+report the task as done you MUST:
 
-1. **Run the linters on the files you changed:**
-   - Python → `pylint` (use the project's config, or this plugin's `pylintrc`). Install with `pip install pylint pylint-odoo` if missing.
-   - JavaScript → `eslint` (use the project's config, or this plugin's `eslintrc`).
+1. **Run the linter on the files/module you changed** — pylint with this plugin's
+   `pylintrc` (Python) and/or ESLint with its `eslintrc` (JS), as shown above.
 2. **Fix every reported error.** Re-run until clean.
-3. If a linter isn't installed or can't run, **say so explicitly** and list what you checked manually against the rules above — don't silently skip it.
+3. If the linter isn't installed and you can't install it, **say so explicitly**
+   and list what you checked manually against the rules above — don't silently
+   skip it.
 
 Do not consider the task complete while lint errors remain.

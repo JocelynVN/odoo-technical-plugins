@@ -5,6 +5,13 @@ Mirrors the checks in Odoo's official **`test_lint`** module
 which is what quality gates like Viindoo's `test_pylint` build on. Two linters:
 **pylint** for Python and **ESLint** for JavaScript.
 
+> **Important:** `test_lint` is not a standalone tool. The Python checks are
+> **pylint plugins** in the Odoo source (`odoo/addons/test_lint/tests/_odoo_checker_*.py`)
+> and the JS check is an **ESLint** config — and Odoo ships *neither* pylint nor
+> eslint in `requirements.txt` (its own test skips when they're missing). So you
+> install the linter once, then point it at Odoo's own checkers using the
+> [`pylintrc`](pylintrc) / [`eslintrc`](eslintrc) in this folder (see "Run it" below).
+
 ## Python — pylint
 
 Odoo's `test_pylint.py` runs pylint with `--disable=all` and enables a small,
@@ -41,12 +48,17 @@ high-signal set of checks plus custom Odoo checkers.
           raise UserError(self.env._("Locked records cannot be deleted."))
   ```
 
-**Run it**
+**Run it** — the [`pylintrc`](pylintrc) here loads Odoo's own checker plugins
+(`_odoo_checker_*`) from the Odoo source, so you get the authentic Odoo checks:
 ```bash
-pylint --rcfile=pylintrc path/to/your_module        # standalone subset
-pip install pylint-odoo                              # for the odoo-specific checks
+pip install "pylint>=3.0"                           # Odoo doesn't bundle pylint
+pylint --rcfile=pylintrc path/to/your_module
 ```
-See [`pylintrc`](pylintrc) in this folder.
+The rcfile's `init-hook` locates the checkers next to the importable `odoo`
+package; if `odoo` isn't importable, prepend the source path instead:
+`PYTHONPATH="/path/to/odoo/odoo/addons/test_lint/tests:$PYTHONPATH"`.
+No Odoo source? `pip install pylint-odoo` and swap the `_odoo_checker_*` plugins
+for `pylint_odoo` in the rcfile.
 
 ## JavaScript — ESLint
 
@@ -62,9 +74,9 @@ Key rules:
   - **OWL `Component` subclasses must declare `static props` and `static template`.**
   - `_t(...)` must not contain multiple unnamed `%s` placeholders — use named ones.
 
-**Run it**
+**Run it** (eslint isn't bundled by Odoo either — fetch it via npx):
 ```bash
-eslint --no-eslintrc -c eslintrc "your_module/static/src/**/*.js"
+npx --yes eslint@8 --no-eslintrc -c eslintrc "your_module/static/src/**/*.js"
 ```
 Point-of-sale modules use a stricter config (`web/tooling/_eslintrc.json`) in Odoo.
 

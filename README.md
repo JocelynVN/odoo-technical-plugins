@@ -9,7 +9,7 @@ Each plugin is self-contained under [`plugins/`](plugins); the [`npx` installer]
 | Plugin | Description | Docs |
 |--------|-------------|------|
 | [`odoo-technical-rules`](plugins/odoo-technical-rules) | General, vendor-neutral Odoo coding rules (naming, manifest, views, Python/ORM, security, commits, stable policy). VI + EN. | [README](plugins/odoo-technical-rules/README.md) · [Install](plugins/odoo-technical-rules/INSTALL.md) |
-| [`odoo-test-lint`](plugins/odoo-test-lint) | Make Python & JS pass Odoo's official linters (`test_lint` pylint checks + ESLint): SQL-injection, lazy translations, OWL static props/template, no private fields. | [README](plugins/odoo-test-lint/README.md) |
+| [`odoo-test-lint`](plugins/odoo-test-lint) | Make Python & JS pass Odoo's official linters (`test_lint` pylint checks + ESLint): SQL-injection, lazy translations, OWL static props/template, no private fields. Ships a `pylintrc` that loads **Odoo's own checker plugins**. | [README](plugins/odoo-test-lint/README.md) |
 
 > More plugins will be added here over time.
 
@@ -48,6 +48,12 @@ npx odoo-technical-plugins@latest update        # refresh to the latest rules
 npx odoo-technical-plugins uninstall            # remove cleanly
 ```
 
+The `odoo-test-lint` plugin ships ready-to-use `pylintrc`/`eslintrc` configs that
+drive **Odoo's own `test_lint` checkers** (the SQL-injection / gettext /
+unlink-override pylint plugins that live in the Odoo source), so the agent runs
+the authentic Odoo checks rather than a reimplementation — see that
+[plugin's README](plugins/odoo-test-lint/README.md#-how-to-run-the-checks-odoos-own-linters).
+
 > **Customizing:** the installed rules sit in a `<!-- BEGIN/END <plugin> -->` block
 > that `update` overwrites — keep team tweaks **outside** that block (elsewhere in
 > your `AGENTS.md` / `CLAUDE.md`), or they'll be replaced on the next update.
@@ -64,6 +70,10 @@ plugins/
     rules/                    # full ruleset (en + vi) + reference material
     README.md
     INSTALL.md
+  odoo-test-lint/             # plugin #2
+    skills/<plugin>/SKILL.md
+    rules/                    # eslintrc + pylintrc (loads Odoo's checkers) + notes
+    README.md
 ```
 
 The `SKILL.md` body is the source of the rules text; the installer wraps it in a

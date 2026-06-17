@@ -36,6 +36,7 @@ Consult those (links above) before a non-trivial change. The checklist below is 
 - Never build SQL via string concatenation — use parameterized queries. Don't bypass the ORM if `search`/`read` can do it (document with a docstring if you must).
 - Validate with `@api.constrains`, not `onchange` (onchange may only warn).
 - **Docstrings**: mandatory on public methods; must pass `flake8-docstrings` (PEP 257) — triple double-quotes, imperative summary ending in a period, blank line before the body.
+- **Quotes**: single quotes `'...'` for plain strings and dict/list/tuple keys; double quotes `"..."` for user-facing messages and field `help`; `"""..."""` for docstrings.
 
 **Security**
 - Define access in `ir.model.access.csv`; declare groups and record rules in `security.xml` with same-model rules kept contiguous.

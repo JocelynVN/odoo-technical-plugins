@@ -1,21 +1,49 @@
-# Standalone pylint config approximating Odoo's test_lint
-# (odoo/addons/test_lint/tests/test_pylint.py).
+# pylint config that runs Odoo's REAL test_lint checks, using Odoo's own
+# checker plugins (the ones in odoo/addons/test_lint/tests). This is exactly
+# what Odoo's test_pylint.py runs — same plugins, same enabled messages — so
+# you get Odoo's authentic SQL-injection / gettext / unlink-override checks,
+# not a reimplementation.
 #
-# The standard-pylint checks Odoo enables work as-is with this file:
+# Requirements: pylint must be installed (Odoo does NOT ship it in
+# requirements.txt, and Odoo's own test silently skips when it's missing):
+#     pip install "pylint>=3.0"
+#
+# Run it from a place where the `odoo` package is importable (i.e. your Odoo
+# dev environment). The init-hook below finds Odoo's checker modules next to
+# the installed odoo package and puts them on sys.path so load-plugins can
+# import them by name — the same mechanism test_pylint.py uses.
+#
 #     pylint --rcfile=pylintrc path/to/your_module
 #
-# NOTE: Odoo's full test_lint also runs custom checkers that live inside the
-# Odoo source (sql-injection, gettext-variable/placeholders/repr,
-# raise-unlink-override) and only run inside Odoo's own test suite. For a
-# standalone CI equivalent of those, install pylint-odoo:
-#     pip install pylint-odoo
-# then uncomment the load-plugins line below and enable its odoo checks.
+# If `odoo` is NOT importable but you have the source tree, point pylint at the
+# checkers manually instead of relying on the init-hook:
+#     PYTHONPATH="/path/to/odoo/odoo/addons/test_lint/tests:$PYTHONPATH" \
+#         pylint --rcfile=pylintrc path/to/your_module
+#
+# Pure-pip alternative (no Odoo source needed): `pip install pylint-odoo` and
+# replace the three _odoo_checker_* plugins below with `pylint_odoo`.
 
 [MAIN]
-load-plugins=pylint.extensions.bad_builtin
-# load-plugins=pylint.extensions.bad_builtin,pylint_odoo
+# Make Odoo's own checker modules importable (mirrors test_pylint.py, which
+# adds odoo/addons/test_lint/tests to PYTHONPATH). No-op if odoo isn't found,
+# so the manual PYTHONPATH route above still works.
+init-hook=
+    import os, sys
+    try:
+        import odoo
+        sys.path.insert(0, os.path.join(os.path.dirname(odoo.__file__), "addons", "test_lint", "tests"))
+    except Exception:
+        pass
+
+# bad_builtin is a stock pylint extension; the _odoo_checker_* are Odoo's own.
+load-plugins=
+    pylint.extensions.bad_builtin,
+    _odoo_checker_sql_injection,
+    _odoo_checker_gettext,
+    _odoo_checker_unlink_override
 
 [MESSAGES CONTROL]
+# Exactly the set test_pylint.py enables.
 disable=all
 enable=
     used-before-assignment,
@@ -24,21 +52,21 @@ enable=
     unreachable,
     function-redefined,
     bad-builtin,
-    deprecated-module
-    # With pylint-odoo installed, also enable e.g.:
-    #   sql-injection,
-    #   translation-required,
-    #   translation-format-interpolation,
-    #   translation-fstring-interpolation,
-    #   print-used
+    deprecated-module,
+    sql-injection,
+    gettext-variable,
+    gettext-placeholders,
+    gettext-repr,
+    raise-unlink-override
 
 [DEPRECATED_BUILTINS]
 bad-functions=input
 
 [IMPORTS]
+# csv/urllib/cgi + Odoo's SUPPORTED_DEBUGGER (pdb, ipdb, pudb, q).
 deprecated-modules=csv,urllib,cgi,pdb,ipdb,pudb,q
 
 [REPORTS]
 reports=no
 score=no
-msg-template={msg} ({msg_id}) at {path}:{line}
+msg-template={path}:{line}: [{msg_id}] {symbol}: {msg}
