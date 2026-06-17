@@ -50,8 +50,8 @@ high-signal set of checks plus custom Odoo checkers.
   `self.env._()` must wrap a **plain string literal**: no variable argument, no
   f-string or `.format()`, no `%r`. Interpolate **after** translation:
   ```python
-  raise UserError(self.env._("Record %s is locked", record.name))
-  message = self.env._("Hello %(name)s") % {"name": partner.name}
+  raise UserError(_("Record %s is locked", record.name))
+  message = _("Hello %(name)s") % {"name": partner.name}
   ```
 - `raise-unlink-override` — don't override `unlink()` solely to `raise`. Prevent
   deletion declaratively instead:
@@ -59,7 +59,7 @@ high-signal set of checks plus custom Odoo checkers.
   @api.ondelete(at_uninstall=False)
   def _unlink_except_locked(self):
       if any(rec.locked for rec in self):
-          raise UserError(self.env._("Locked records cannot be deleted."))
+          raise UserError(_("Locked records cannot be deleted."))
   ```
 
 These checkers (`_odoo_checker_*`) live in the Odoo source and run automatically

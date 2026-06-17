@@ -455,7 +455,7 @@ def action_confirm(self):
 - When iterating a recordset, name the variable `record` (or `rec`) if it's an instance of the current model; otherwise use a different name.
 - Use `%(varname)s` (named) instead of positional `%s` for readability and translation.
 - Don't use the `_compute`/`compute` prefix for methods that aren't computing a field.
-- Single quotes for strings and dict/tuple/list keys; double quotes for user-facing messages and help.
+- Single quotes `'...'` for plain strings and dict/tuple/list keys. Double quotes `"..."` for any string **shown to a user** — the argument of `_()` (or `self.env._()`), messages raised in `UserError` / `ValidationError` / etc., and a field's `string` / `help`. Example: `raise ValidationError(_("Login failed or no cookies returned"))`.
 - Use `"""..."""` for docstrings.
 
 ---
