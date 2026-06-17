@@ -21,13 +21,19 @@ Odoo's `test_lint` isn't a standalone tool — its Python checks are **pylint
 plugins** that live in the Odoo source you already have
 (`odoo/addons/test_lint/tests/_odoo_checker_*.py`), and its JS check is an
 **ESLint** config. Odoo doesn't ship pylint/eslint, so install the linter and
-point it at Odoo's own checkers via the configs in [`rules/`](rules):
+point it at Odoo's own checkers via the configs in [`rules/`](rules). The
+checkers only load when `odoo` is importable, so run the pylint **from your Odoo
+virtualenv** (`<venv>/bin/pylint`) — the installed rules make the agent ask for
+that venv path:
 
 ```bash
-pip install "pylint>=3.0"
-pylint --rcfile=rules/pylintrc path/to/your_module          # runs Odoo's real checkers
+"<venv>/bin/pip" install "pylint>=3.0"                       # one-time, in your Odoo venv
+"<venv>/bin/pylint" --rcfile=rules/pylintrc path/to/your_module   # runs Odoo's real checkers
 npx --yes eslint@8 --no-eslintrc -c rules/eslintrc "your_module/static/src/**/*.js"
 ```
+
+(Odoo running from a source checkout that isn't pip-installed? Pass the source
+root: `ODOO_PATH=/path/to/odoo "<venv>/bin/pylint" --rcfile=rules/pylintrc …`.)
 
 The bundled [`rules/pylintrc`](rules/pylintrc) loads Odoo's exact checker plugins
 (`_odoo_checker_sql_injection`, `_odoo_checker_gettext`,
